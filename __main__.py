@@ -1,4 +1,6 @@
-import tokenizing
-import collocations
+import sys
+import os
+from functools import reduce
 
+import collocations
 

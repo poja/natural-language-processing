@@ -1,5 +1,5 @@
-import sys, os
-
+import sys
+import os
 import re
 
 import requests
@@ -21,7 +21,7 @@ def isdigit(char):
 
 
 def issymbol(char):
-    return char in ['@', '#', '$', '%', '&', '*', '+']
+    return char in ['@', '#', '$', '%', '&', '*', '+', '<', '>']
 
 
 def isletter(char):
@@ -33,6 +33,7 @@ def isletter(char):
 def get_page(url):
     r = requests.get(url)
     return r.text
+
 
 def ynet_strip(html):
     """
@@ -98,6 +99,7 @@ def ynet_strip(html):
         return clean_text(ans)
 
     return get_title() + get_subtitle() + get_body()
+
 
 # ---- Dividing into sentences ----
 
@@ -208,12 +210,14 @@ def save_to_file(text, filename):
     file.write(text)
     file.close()
 
+
 def file_contents(filename):
     # Read contents from a file
     file = open(filename, 'r')
     ans = file.read()
     file.close()
     return ans
+
 
 FILE_NAME_ARTICLE = 'article.txt'
 FILE_NAME_SENTENCES = 'article_sentences.txt'
