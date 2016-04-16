@@ -1,28 +1,10 @@
-# -*- coding: utf-8 -*-
 import math
 from functools import reduce
 import sys
 import os
 
-import tokenizing
-
 
 # --------------------- Utility --------------------------
-
-
-def tokenize_if_necessary(text, to_tokenize):
-    """
-    :param text: A long text, typically made of more than one sentence. Could be tokenized or just a string
-    :param to_tokenize: Whether the text is a string and needs to be tokenized, or already tokenized and just needs
-     to be passed on as is.
-    :return: A representation of the text as a list of sentences, where each sentence is represented
-     as a list of tokens.
-    """
-    if to_tokenize:
-        return [tokenizing.tokenize(sentence) for sentence in tokenizing.sentencize(text)]
-    else:
-        return text
-
 
 def str_ngram(ngram_w_value, amplify=1):
     """
@@ -40,17 +22,13 @@ def str_ngram(ngram_w_value, amplify=1):
 # ----------- Getting n-grams from the text --------------
 
 
-def all_unigrams(text, to_tokenize=True):
+def all_unigrams(text_tokenized):
     """
-    :param text: A long text, generally made up of different sentences.
-     The format of this parameter is determined by the parameter to_tokenize
-    :param: to_tokenize: a boolean, saying if the text is given as a long string of sentences, and should be tokenized,
-     or is already tokenized, i.e. given as an array of sentences, each represented by an array of tokens
+    :param text_tokenized: A long text, generally made up of different sentences.
+     Tokenized, i.e. given as an array of sentences, each represented by an array of tokens
     :return: A list of unigrams in the text Collocations will appear in the order of appearance in the text -
      collocations that appear more than once in the text will appear more than once in the returned list.
     """
-    text_tokenized = tokenize_if_necessary(text, to_tokenize)
-
     unigrams = []
     for sentence in text_tokenized:
         sentence = list(filter(lambda x: x != ' ', sentence))
@@ -58,18 +36,14 @@ def all_unigrams(text, to_tokenize=True):
     return unigrams
 
 
-def all_collocations(text, to_tokenize=True):
+def all_collocations(text_tokenized):
     """
-    :param text: A long text, generally made up of different sentences.
-     The format of this parameter is determined by the parameter to_tokenize
-    :param: to_tokenize: a boolean, saying if the text is given as a long string of sentences, and should be tokenized,
-     or is already tokenized, i.e. given as an array of sentences, each represented by an array of tokens
+    :param text_tokenized: A long text, generally made up of different sentences.
+     Tokenized, i.e. given as an array of sentences, each represented by an array of tokens
     :return: A list of collocations in the text, each in the form (first, second).
      Collocations will appear in the order of appearance in the text - collocations that appear more than once in the
      text will appear more than once in the returned list.
     """
-    text_tokenized = tokenize_if_necessary(text, to_tokenize)
-
     collocations = []
     for sentence in text_tokenized:
         sentence = list(filter(lambda x: x != ' ', sentence))
@@ -78,18 +52,14 @@ def all_collocations(text, to_tokenize=True):
     return collocations
 
 
-def all_trigrams(text, to_tokenize=True):
+def all_trigrams(text_tokenized):
     """
-    :param text: A long text, generally made up of different sentences.
-     The format of this parameter is determined by the parameter to_tokenize
-    :param: to_tokenize: a boolean, saying if the text is given as a long string of sentences, and should be tokenized,
-     or is already tokenized, i.e. given as an array of sentences, each represented by an array of tokens
+    :param text_tokenized: A long text, generally made up of different sentences.
+     Tokenized, i.e. given as an array of sentences, each represented by an array of tokens
     :return: A list of trigrams in the text, each in the form (first, second, third).
      Trigrams will appear in the order of appearance in the text - trigrams that appear more than once in the
      text will appear more than once in the returned list.
     """
-    text_tokenized = tokenize_if_necessary(text, to_tokenize)
-
     trigrams = []
     for sentence in text_tokenized:
         sentence = list(filter(lambda x: x != ' ', sentence))
@@ -101,18 +71,15 @@ def all_trigrams(text, to_tokenize=True):
 # ------------ Calculate n-gram statistics --------------
 
 
-def unigram_probabilities(text, to_tokenize=True):
+def unigram_probabilities(tokenized_text):
     """
     Calculate the probability of each unigram, by MLE of the text.
     Calculation: Pr = #{ specific unigram } / #{ unigrams }
-    :param text: A long text, generally made up of different sentences.
-     The format of this parameter is determined by the parameter to_tokenize
-    :param: to_tokenize: a boolean, saying if the text is given as a long string of sentences, and should be tokenized,
-     or is already tokenized, i.e. given as an array of sentences, each represented by an array of tokens
+    :param tokenized_text: A long text, generally made up of different sentences.
+     Tokenized, i.e. given as an array of sentences, each represented by an array of tokens
     :return: A dictionary, from unigrams (string token) to probabilities
     """
-    tokenized_text = tokenize_if_necessary(text, to_tokenize)
-    unigrams_list = all_unigrams(tokenized_text, False)
+    unigrams_list = all_unigrams(tokenized_text)
     unigrams_count = len(unigrams_list)
     unigram_prob = {}
     for unigram in unigrams_list:
@@ -123,19 +90,17 @@ def unigram_probabilities(text, to_tokenize=True):
     return unigram_prob
 
 
-def collocation_raw_frequencies(text, to_tokenize=True):
+def collocation_raw_frequencies(tokenized_text):
     """
     Calculate the raw frequencies of each collocation in the text.
     Calculation: Freq = #{ collocation } / #{ unigrams }
-    :param text: A long text, generally made up of different sentences.
-     The format of this parameter is determined by the parameter to_tokenize
-    :param: to_tokenize: a boolean, saying if the text is given as a long string of sentences, and should be tokenized,
-     or is already tokenized, i.e. given as an array of sentences, each represented by an array of tokens
+    :param tokenized_text: A long text, generally made up of different sentences.
+     Tokenized, i.e. given as an array of sentences, each represented by an array of tokens
     :return: A dictionary, from collocations (2-tuple (first, second)) to raw frequencies
     """
-    tokenized_text = tokenize_if_necessary(text, to_tokenize)
-    unigrams_count = len(all_unigrams(tokenized_text, to_tokenize=False))
-    collocations_list = all_collocations(tokenized_text, False)
+    
+    unigrams_count = len(all_unigrams(tokenized_text))
+    collocations_list = all_collocations(tokenized_text)
     collocation_frequencies = {}
     for collocation in collocations_list:
         if collocation in collocation_frequencies:
@@ -145,18 +110,16 @@ def collocation_raw_frequencies(text, to_tokenize=True):
     return collocation_frequencies
 
 
-def collocation_probabilities(text, to_tokenize=True):
+def collocation_probabilities(tokenized_text):
     """
     Calculate the probability of each collocation, by MLE of the text.
     Calculation: Pr = #{ specific collocation } / #{ collocations }
-    :param text: A long text, generally made up of different sentences.
-     The format of this parameter is determined by the parameter to_tokenize
-    :param: to_tokenize: a boolean, saying if the text is given as a long string of sentences, and should be tokenized,
-     or is already tokenized, i.e. given as an array of sentences, each represented by an array of tokens
+    :param tokenized_text: A long text, generally made up of different sentences.
+     Tokenized, i.e. given as an array of sentences, each represented by an array of tokens
     :return: A dictionary, from collocations (2-tuple (first, second)) to probabilities
     """
-    tokenized_text = tokenize_if_necessary(text, to_tokenize)
-    collocations_list = all_collocations(tokenized_text, False)
+    
+    collocations_list = all_collocations(tokenized_text)
     collocations_count = len(collocations_list)
     collocation_prob = {}
     for collocation in collocations_list:
@@ -167,22 +130,20 @@ def collocation_probabilities(text, to_tokenize=True):
     return collocation_prob
 
 
-def collocation_pmi_values(text, to_tokenize=True, wordcount_filter=1):
+def collocation_pmi_values(tokenized_text, wordcount_filter=1):
     """
     Calculate the PMI value of each collocation.
     Calculation: PMI(x,y) = log [ Pr(x,y) / Pr(x)Pr(y) ]
-    :param text: A long text, generally made up of different sentences.
-     The format of this parameter is determined by the parameter to_tokenize
-    :param: to_tokenize: a boolean, saying if the text is given as a long string of sentences, and should be tokenized,
-     or is already tokenized, i.e. given as an array of sentences, each represented by an array of tokens
+    :param tokenized_text: A long text, generally made up of different sentences.
+     Tokenized, i.e. given as an array of sentences, each represented by an array of tokens
     :param: wordcount_filter: Filter out collocations, that their tokens have less than this number of occurrences
      in the text. Default 1 - no filtering.
     :return: A dictionary, from collocations (2-tuple (first, second)) to PMI values
     """
-    tokenized_text = tokenize_if_necessary(text, to_tokenize)
-    unigrams_pr = unigram_probabilities(tokenized_text, to_tokenize=False)
-    uni_count = len(all_unigrams(tokenized_text, to_tokenize=False))
-    collocations_pr = collocation_probabilities(tokenized_text, to_tokenize=False)
+    
+    unigrams_pr = unigram_probabilities(tokenized_text)
+    uni_count = len(all_unigrams(tokenized_text))
+    collocations_pr = collocation_probabilities(tokenized_text)
     collocations_pr_filtered = {col: pr for col, pr in collocations_pr.items()
                                 if round(uni_count * unigrams_pr[col[0]]) >= wordcount_filter and
                                 round(uni_count * unigrams_pr[col[1]]) >= wordcount_filter}
@@ -193,18 +154,16 @@ def collocation_pmi_values(text, to_tokenize=True, wordcount_filter=1):
     return collocations_pmi
 
 
-def trigram_probabilities(text, to_tokenize=True):
+def trigram_probabilities(tokenized_text):
     """
     Calculate the probability of each trigram, by MLE of the text.
     Calculation: Pr = #{ specific trigram } / #{ trigrams }
-    :param text: A long text, generally made up of different sentences.
-     The format of this parameter is determined by the parameter to_tokenize
-    :param: to_tokenize: a boolean, saying if the text is given as a long string of sentences, and should be tokenized,
-     or is already tokenized, i.e. given as an array of sentences, each represented by an array of tokens
+    :param tokenized_text: A long text, generally made up of different sentences.
+     Tokenized, i.e. given as an array of sentences, each represented by an array of tokens
     :return: A dictionary, from trigrams (3-tuple (first, second, third)) to probabilities
     """
-    tokenized_text = tokenize_if_necessary(text, to_tokenize)
-    trigrams_list = all_trigrams(tokenized_text, False)
+    
+    trigrams_list = all_trigrams(tokenized_text)
     trigrams_count = len(trigrams_list)
     trigrams_prob = {}
     for trigram in trigrams_list:
@@ -215,28 +174,26 @@ def trigram_probabilities(text, to_tokenize=True):
     return trigrams_prob
 
 
-def trigram_pmi_values(text, pmi_type, to_tokenize=True, wordcount_filter=1):
+def trigram_pmi_values(tokenized_text, pmi_type, wordcount_filter=1):
     """
     Calculate the PMI value of each trigram.
     Since PMI value of a trigram is not well-defined, parameter pmi_type specifies how to calculate the PMI value.
-    :param text: A long text, generally made up of different sentences.
-     The format of this parameter is determined by the parameter to_tokenize
+    :param tokenized_text: A long text, generally made up of different sentences.
+     Tokenized, i.e. given as an array of sentences, each represented by an array of tokens
     :param: pmi_type: A character, one of three options 'a', 'b', 'c'. Each specifies a different PMI calculation:
      PMI_a(x, y, z) = Pr(xyz) / Pr(x)Pr(y)Pr(z)
      PMI_b(x, y, z) = Pr(xyz) / Pr(xy)Pr(yz)
      PMI_c(x, y, z) = Pr(xyz) / Pr(x)Pr(y)Pr(z)Pr(xy)Pr(yz)
-    :param: to_tokenize: a boolean, saying if the text is given as a long string of sentences, and should be tokenized,
-     or is already tokenized, i.e. given as an array of sentences, each represented by an array of tokens
     :param: wordcount_filter: Filter out trigrams, that their tokens have less than this number of occurrences
      in the text. Default 1 - no filtering.
     :return: A dictionary, from trigrams (3-tuple (first, second, third)) to PMI values
     """
-    tokenized_text = tokenize_if_necessary(text, to_tokenize)
-    unigrams_pr = unigram_probabilities(tokenized_text, to_tokenize=False)
-    uni_count = len(all_unigrams(tokenized_text, to_tokenize=False))
-    collocations_pr = collocation_probabilities(tokenized_text, to_tokenize=False) \
+    
+    unigrams_pr = unigram_probabilities(tokenized_text)
+    uni_count = len(all_unigrams(tokenized_text))
+    collocations_pr = collocation_probabilities(tokenized_text) \
         if pmi_type != 'a' else None
-    trigrams_pr = trigram_probabilities(tokenized_text, to_tokenize=False)
+    trigrams_pr = trigram_probabilities(tokenized_text)
     trigrams_pr_filtered = {trig: pr for trig, pr in trigrams_pr.items()
                             if round(uni_count * unigrams_pr[trig[0]]) >= wordcount_filter and
                             round(uni_count * unigrams_pr[trig[1]]) >= wordcount_filter and
@@ -322,31 +279,31 @@ if __name__ == '__main__':
             filter(lambda tok: tok != '', corpus_tok[i].split(' ')))  # split by ' ' and remove empty tokens
 
     # Collocation Raw Frequency
-    collocation_rawfreq_dict = collocation_raw_frequencies(corpus_tok, to_tokenize=False)
+    collocation_rawfreq_dict = collocation_raw_frequencies(corpus_tok)
     collocation_frawfreq = best_ngrams(collocation_rawfreq_dict)
     str_output = reduce(lambda prev, cur: prev + str_ngram(cur, 1000) + '\n', collocation_frawfreq, '')
     save_to_file(str_output, output_folder + '/' + OUTPUT_FILE_FREQ_RAW)
 
     # Collocation PMI
-    collocation_pmi_dict = collocation_pmi_values(corpus_tok, to_tokenize=False, wordcount_filter=WORDCOUNT_FILTER)
+    collocation_pmi_dict = collocation_pmi_values(corpus_tok, wordcount_filter=WORDCOUNT_FILTER)
     collocation_pmi = best_ngrams(collocation_pmi_dict)
     str_output = reduce(lambda prev, cur: prev + str_ngram(cur) + '\n', collocation_pmi, '')
     save_to_file(str_output, output_folder + '/' + OUTPUT_FILE_PMI_PAIR)
 
     # Trigram PMI A
-    trigram_pmi_dict = trigram_pmi_values(corpus_tok, 'a', to_tokenize=False, wordcount_filter=WORDCOUNT_FILTER)
+    trigram_pmi_dict = trigram_pmi_values(corpus_tok, 'a', wordcount_filter=WORDCOUNT_FILTER)
     trigram_pmi = best_ngrams(trigram_pmi_dict)
     str_output = reduce(lambda prev, cur: prev + str_ngram(cur) + '\n', trigram_pmi, '')
     save_to_file(str_output, output_folder + '/' + OUTPUT_FILE_PMI_TRI_A)
 
     # Trigram PMI B
-    trigram_pmi_dict = trigram_pmi_values(corpus_tok, 'b', to_tokenize=False, wordcount_filter=WORDCOUNT_FILTER)
+    trigram_pmi_dict = trigram_pmi_values(corpus_tok, 'b', wordcount_filter=WORDCOUNT_FILTER)
     trigram_pmi = best_ngrams(trigram_pmi_dict)
     str_output = reduce(lambda prev, cur: prev + str_ngram(cur) + '\n', trigram_pmi, '')
     save_to_file(str_output, output_folder + '/' + OUTPUT_FILE_PMI_TRI_B)
 
     # Trigram PMI C
-    trigram_pmi_dict = trigram_pmi_values(corpus_tok, 'c', to_tokenize=False, wordcount_filter=WORDCOUNT_FILTER)
+    trigram_pmi_dict = trigram_pmi_values(corpus_tok, 'c', wordcount_filter=WORDCOUNT_FILTER)
     trigram_pmi = best_ngrams(trigram_pmi_dict)
     str_output = reduce(lambda prev, cur: prev + str_ngram(cur) + '\n', trigram_pmi, '')
     save_to_file(str_output, output_folder + '/' + OUTPUT_FILE_PMI_TRI_C)
