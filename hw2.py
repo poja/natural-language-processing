@@ -100,6 +100,7 @@ def collocation_raw_frequencies(tokenized_text):
     """
     
     unigrams_count = len(all_unigrams(tokenized_text))
+    print('unigrams_count {}'.format(unigrams_count))
     collocations_list = all_collocations(tokenized_text)
     collocation_frequencies = {}
     for collocation in collocations_list:
@@ -121,6 +122,7 @@ def collocation_probabilities(tokenized_text):
     
     collocations_list = all_collocations(tokenized_text)
     collocations_count = len(collocations_list)
+    print('collocations_count {}'.format(collocations_count))
     collocation_prob = {}
     for collocation in collocations_list:
         if collocation in collocation_prob:
@@ -165,6 +167,7 @@ def trigram_probabilities(tokenized_text):
     
     trigrams_list = all_trigrams(tokenized_text)
     trigrams_count = len(trigrams_list)
+    print('trigrams_count {}'.format(trigrams_count))
     trigrams_prob = {}
     for trigram in trigrams_list:
         if trigram in trigrams_prob:
