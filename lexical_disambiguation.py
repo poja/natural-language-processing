@@ -274,7 +274,7 @@ class TextBayes:
 class ConfusionMatrix:
     def __init__(self, classifier, samples, classes):
         """
-        Computes a Confusion Matrix for the classifier, and allows precision and recall queriess
+        Computes a Confusion Matrix for the classifier, and allows precision and recall queries
         :param classifier: The classifier that needs to be tested. Needs a `predict` method.
         :param samples: The test items that are classified
         :param classes: The classes that the test items belong to

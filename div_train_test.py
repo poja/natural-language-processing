@@ -51,7 +51,7 @@ def divide_instances(instances, test_size):
     senses = list(set([get_sense(instance) for instance in instances]))
     training_instances = []
     testing_instances = []
-    test_count = np.ndarray((len(senses)))
+    test_count = np.zeros((len(senses)))
     for instance in instances:
         for sense_i in range(len(senses)):
             if senses[sense_i] == get_sense(instance):
@@ -91,5 +91,5 @@ if __name__ == "__main__":
     tree = ElementTree.parse(input_path)
     training, testing = divide_tree(tree)
 
-    save_to_file(ElementTree.tostring(training.getroot(), encoding='unicode'), output_path + './train.xml')
-    save_to_file(ElementTree.tostring(testing.getroot(), encoding='unicode'), output_path + './test.xml')
+    save_to_file(ElementTree.tostring(training.getroot(), encoding='unicode'), output_path + '/train.xml')
+    save_to_file(ElementTree.tostring(testing.getroot(), encoding='unicode'), output_path + '/test.xml')
